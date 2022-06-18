@@ -56,6 +56,18 @@ class APRSListener:
                 await self.submit_check(packet.source, comment.decode("ascii"))
 
             case aprs.InformationField(
+                comment=comment, data_type=aprs.DataType.TELEMETRY_DATA
+            ) if comment.startswith(b"#"):
+                seq, *analog, bits = comment[1:].decode("ascii").split(",")
+                telem = [
+                    f"telem_seq={seq}",
+                    *[f"telem_analog{idx}={a}" for idx, a in enumerate(analog)],
+                    f"telem_bits={bits}",
+                ]
+                print("TELEM:", telem)
+                await self.submit_check(packet.source, comment.decode("ascii"), telem)
+
+            case aprs.InformationField(
                 comment=comment, data_type=aprs.DataType.STATION_CAPABILITIES
             ) if comment.startswith(b"IGATE,"):
                 # IGate StatusBeacon, should be comma seperated "key=value" fields
