@@ -6,8 +6,9 @@ authors = [
     {name = "Adam Goldsmith", email = "adam@adamgoldsmith.name"},
 ]
 dependencies = [
-    "requests~=2.28",
-    "aprs3~=8.0"]
+    "aprs3~=8.0",
+    "aiohttp[speedups]~=3.8",
+]
 requires-python = ">=3.9"
 license = {text = "MIT"}
 
