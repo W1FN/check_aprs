@@ -52,7 +52,6 @@ class APRSListener:
         print(packet.info)
         match packet.info:
             case aprs.PositionReport(_position=position, comment=comment):
-                print("POS:", position, comment)
                 await self.submit_check(packet.source, comment.decode("ascii"))
 
             case aprs.InformationField(
@@ -64,7 +63,6 @@ class APRSListener:
                     *[f"telem_analog{idx}={a}" for idx, a in enumerate(analog)],
                     f"telem_bits={bits}",
                 ]
-                print("TELEM:", telem)
                 await self.submit_check(packet.source, comment.decode("ascii"), telem)
 
             case aprs.InformationField(
@@ -77,7 +75,6 @@ class APRSListener:
                 )
 
             case aprs.InformationField(comment=comment):
-                print("INFO:", comment)
                 await self.submit_check(packet.source, comment.decode("ascii"))
 
     async def run(self):
