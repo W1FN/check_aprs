@@ -34,7 +34,7 @@ class APRSListener:
             "filter": f'service.name=="aprsis" && host.vars.aprs.callsign=="{callsign}"',
             "exit_status": 0,
             "plugin_output": f"OK: {message}",
-            # "check_source": "example.localdomain",
+            "check_source": "APRSIS",
         }
 
         if performance_data is not None:
