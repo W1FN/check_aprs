@@ -8,7 +8,7 @@ from typing import Optional
 import aiohttp
 import aprs
 
-from secrets import ICINGA_AUTH
+from secrets import ICINGA_AUTH, ICINGA_FINGERPRINT
 
 APRSIS_HOST = "noam.aprs2.net"
 ICINGA_HOST = "https://localhost:5665"
@@ -93,7 +93,7 @@ async def main():
     async with aiohttp.ClientSession(
         base_url=ICINGA_HOST,
         auth=aiohttp.BasicAuth(*ICINGA_AUTH),
-        connector=aiohttp.TCPConnector(ssl=False),
+        connector=aiohttp.TCPConnector(ssl=aiohttp.Fingerprint(ICINGA_FINGERPRINT)),
         headers={"Accept": "application/json"},
     ) as session:
         await APRSListener(session).run()
