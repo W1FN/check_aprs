@@ -14,8 +14,12 @@ dependencies = [
 requires-python = ">=3.10"
 license = {text = "MIT"}
 
+[project.scripts]
+check_aprs = "check_aprs:main"
+
 [tool]
 [tool.pdm]
+includes = ["check_aprs.py"]
 
 [tool.black]
 
