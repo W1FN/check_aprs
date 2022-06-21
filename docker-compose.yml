@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  check_aprs:
+    build: .
+    restart: unless-stopped
+    environment:
+      ICINGA_USERNAME: check_aprs
+      ICINGA_PASSWORD: changeme
+      ICINGA_FINGERPRINT: "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
