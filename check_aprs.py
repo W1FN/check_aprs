@@ -5,15 +5,12 @@ import dataclasses
 
 import aiohttp
 import aprs
-
-from secrets import ICINGA_AUTH, ICINGA_FINGERPRINT
-
-APRSIS_HOST = "noam.aprs2.net"
-ICINGA_HOST = "https://localhost:5665"
+import asyncclick as click
 
 
 @dataclasses.dataclass
 class APRSListener:
+    aprsis_host: str
     session: aiohttp.ClientSession
 
     async def get_callsigns(self):
@@ -84,7 +81,7 @@ class APRSListener:
             return
 
         transport, protocol = await aprs.create_aprsis_connection(
-            host=APRSIS_HOST,
+            host=self.aprsis_host,
             port=14580,
             user="KC1GDW",
             passcode="-1",  # use a real passcode for TX
@@ -96,15 +93,60 @@ class APRSListener:
             asyncio.create_task(self.handle_packet(packet))
 
 
-async def main():
+def validate_fingerprint(_ctx, _param, fingerprint: str):
+    try:
+        return bytes.fromhex(fingerprint.replace(":", ""))
+    except ValueError:
+        raise click.BadParameter("must be hexadecimal string (with or without colons)")
+
+
+@click.command(context_settings={"max_content_width": 120})
+@click.option(
+    "--aprsis-host",
+    envvar="APRSIS_HOST",
+    help="APRSIS hostname",
+    default="noam.aprs2.net",
+    show_default=True,
+)
+@click.option(
+    "--icinga-host",
+    envvar="ICINGA_HOST",
+    help="URL for Icinga2 API",
+    default="https://localhost:5665",
+    show_default=True,
+)
+@click.option(
+    "--icinga-username",
+    envvar="ICINGA_USERNAME",
+    help="Username for Icinga2 API (env: ICINGA_USERNAME)",
+    required=True,
+)
+@click.option(
+    "--icinga-password",
+    envvar="ICINGA_PASSWORD",
+    help="Password for Icinga2 API (env: ICINGA_PASSWORD)",
+    required=True,
+)
+@click.option(
+    "--icinga-fingerprint",
+    envvar="ICINGA_FINGERPRINT",
+    help="SSL Certificate fingerprint for Icinga2 API (env: ICINGA_FINGERPRINT)",
+    callback=validate_fingerprint,
+    required=True,
+)
+async def main(
+    icinga_host, icinga_username, icinga_password, icinga_fingerprint, aprsis_host
+):
+    "A passive Icinga monitoring daemon for APRS stations"
+
     async with aiohttp.ClientSession(
-        base_url=ICINGA_HOST,
-        auth=aiohttp.BasicAuth(*ICINGA_AUTH),
-        connector=aiohttp.TCPConnector(ssl=aiohttp.Fingerprint(ICINGA_FINGERPRINT)),
+        base_url=icinga_host,
+        auth=aiohttp.BasicAuth(icinga_username, icinga_password),
+        connector=aiohttp.TCPConnector(ssl=aiohttp.Fingerprint(icinga_fingerprint)),
         headers={"Accept": "application/json"},
     ) as session:
-        await APRSListener(session).run()
+        await APRSListener(aprsis_host, session).run()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
