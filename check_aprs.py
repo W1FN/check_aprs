@@ -2,8 +2,6 @@
 
 import asyncio
 import dataclasses
-import json
-from typing import Optional
 
 import aiohttp
 import aprs
