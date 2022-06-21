@@ -30,7 +30,7 @@ summary = "Async http client/server framework (asyncio)"
 dependencies = [
     "Brotli",
     "aiodns",
-    "aiohttp",
+    "aiohttp~=3.8",
     "cchardet",
 ]
 
@@ -154,6 +154,7 @@ dependencies = [
 [[package]]
 name = "pycparser"
 version = "2.21"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 summary = "C parser in Python"
 
 [[package]]
@@ -187,7 +188,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:445fe8bda51abd5c69c9e4463892875f5426a3878881f3d752654e6fce9205ad"
+content_hash = "sha256:7a60e3719c5ec12f0e6eaeb9912917ecfc222ef9a1417b925c9f970c3669f892"
 
 [metadata.files]
 "aiodns 3.0.0" = [
