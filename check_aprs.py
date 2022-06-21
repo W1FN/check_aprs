@@ -41,10 +41,10 @@ class APRSListener:
         ) as r:
             # TODO: better error handling
             if r.status != 200:
-                print("Error:", r.text)
+                click.echo("Error:", r.text, err=True)
 
     async def handle_packet(self, packet):
-        print(packet.info)
+        click.echo(packet.info)
         match packet.info:
             case aprs.PositionReport(_position=position, comment=comment):
                 await self.submit_check(packet.source, comment.decode("ascii"))
@@ -75,9 +75,9 @@ class APRSListener:
     async def run(self):
         callsigns = await self.get_callsigns()
         if callsigns:
-            print(f"Monitoring callsigns: {', '.join(callsigns)}")
+            click.echo(f"Monitoring callsigns: {', '.join(callsigns)}")
         else:
-            print("No calligns defined in Icinga!")
+            click.echo("No calligns defined in Icinga!")
             return
 
         transport, protocol = await aprs.create_aprsis_connection(
@@ -89,7 +89,7 @@ class APRSListener:
         )
 
         async for packet in protocol.read():
-            print(packet)
+            click.echo(packet)
             asyncio.create_task(self.handle_packet(packet))
 
 
