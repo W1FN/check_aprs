@@ -1,7 +1,7 @@
 [project]
-name = ""
-version = ""
-description = ""
+name = "check_aprs"
+version = "0.1.0"
+description = "A passive Icinga monitoring daemon for APRS stations"
 authors = [
     {name = "Adam Goldsmith", email = "adam@adamgoldsmith.name"},
 ]
