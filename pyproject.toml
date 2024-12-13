@@ -6,12 +6,11 @@ authors = [
     {name = "Adam Goldsmith", email = "adam@adamgoldsmith.name"},
 ]
 dependencies = [
-    "aprs3~=8.0",
-    "aiohttp~=3.8",
-    "asyncclick~=8.1",
-    "anyio~=3.6", # TODO: this is actually an undeclared dependency of asyncclick
+    "aprs3>=8.0.0.post1",
+    "aiohttp>=3.11.10",
+    "asyncclick>=8.1.7.2",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = {text = "MIT"}
 
 [project.scripts]
