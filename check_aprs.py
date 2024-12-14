@@ -2,6 +2,7 @@
 
 import asyncio
 import dataclasses
+import datetime
 
 import aiohttp
 import aprs
@@ -22,6 +23,22 @@ class APRSListener:
                 host["attrs"]["vars"]["aprs"]["callsign"]
                 for host in (await r.json())["results"]
             ]
+
+    async def submit_ping(self):
+        data = {
+            "type": "Service",
+            "filter": 'service.name=="check_aprs"',
+            "exit_status": 0,
+            "plugin_output": f"OK: last packet recieved at {datetime.datetime.now()}",
+            "check_source": "APRSIS",
+        }
+
+        async with self.session.post(
+            "/v1/actions/process-check-result", json=data
+        ) as r:
+            # TODO: better error handling
+            if r.status != 200:
+                click.echo("Error:", r.text, err=True)
 
     async def submit_check(self, callsign, message, performance_data=None):
         data = {
@@ -45,6 +62,7 @@ class APRSListener:
 
     async def handle_packet(self, packet):
         click.echo(packet.info)
+        await self.submit_ping()
         match packet.info:
             case aprs.PositionReport(_position=position, comment=comment):
                 await self.submit_check(packet.source, comment.decode("ascii"))
