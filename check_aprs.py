@@ -151,9 +151,13 @@ async def main(icinga_host, icinga_username, icinga_password, aprsis_host):
 
     async with aiohttp.ClientSession(
         base_url=icinga_host,
-        auth=aiohttp.BasicAuth(icinga_username, icinga_password),
         connector=aiohttp.TCPConnector(ssl=False),
-        headers={"Accept": "application/json"},
+        headers={
+            "Accept": "application/json",
+            "Authorization": aiohttp.encode_basic_auth(
+                icinga_username, icinga_password
+            ),
+        },
     ) as session:
         await APRSListener(aprsis_host, session).run()
 
