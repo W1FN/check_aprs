@@ -119,13 +119,6 @@ class APRSListener:
             asyncio.create_task(self.handle_packet(packet))
 
 
-def validate_fingerprint(_ctx, _param, fingerprint: str):
-    try:
-        return bytes.fromhex(fingerprint.replace(":", ""))
-    except ValueError:
-        raise click.BadParameter("must be hexadecimal string (with or without colons)")
-
-
 @click.command(context_settings={"max_content_width": 120})
 @click.option(
     "--aprsis-host",
@@ -153,22 +146,13 @@ def validate_fingerprint(_ctx, _param, fingerprint: str):
     help="Password for Icinga2 API (env: ICINGA_PASSWORD)",
     required=True,
 )
-@click.option(
-    "--icinga-fingerprint",
-    envvar="ICINGA_FINGERPRINT",
-    help="SSL Certificate fingerprint for Icinga2 API (env: ICINGA_FINGERPRINT)",
-    callback=validate_fingerprint,
-    required=True,
-)
-async def main(
-    icinga_host, icinga_username, icinga_password, icinga_fingerprint, aprsis_host
-):
+async def main(icinga_host, icinga_username, icinga_password, aprsis_host):
     "A passive Icinga monitoring daemon for APRS stations"
 
     async with aiohttp.ClientSession(
         base_url=icinga_host,
         auth=aiohttp.BasicAuth(icinga_username, icinga_password),
-        connector=aiohttp.TCPConnector(ssl=aiohttp.Fingerprint(icinga_fingerprint)),
+        connector=aiohttp.TCPConnector(ssl=False),
         headers={"Accept": "application/json"},
     ) as session:
         await APRSListener(aprsis_host, session).run()
